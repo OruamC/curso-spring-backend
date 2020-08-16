@@ -50,9 +50,8 @@ public abstract class AbstractEmailService implements EmailService {
 	
 	@Override
 	public void sendOrderConfirmationHtmlEmail(Pedido obj) {
-		MimeMessage mm;
 		try {
-			mm = prepareMimeMessagemFromPedido(obj);
+			MimeMessage mm = prepareMimeMessagemFromPedido(obj);
 			sendHtmlEmail(mm);
 		} catch (MessagingException e) {
 			sendOrderConfirmationEmail(obj);
