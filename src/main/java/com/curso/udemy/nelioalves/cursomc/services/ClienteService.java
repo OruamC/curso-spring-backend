@@ -14,11 +14,14 @@ import org.springframework.stereotype.Service;
 import com.curso.udemy.nelioalves.cursomc.domain.Cidade;
 import com.curso.udemy.nelioalves.cursomc.domain.Cliente;
 import com.curso.udemy.nelioalves.cursomc.domain.Endereco;
+import com.curso.udemy.nelioalves.cursomc.domain.enums.Perfil;
 import com.curso.udemy.nelioalves.cursomc.domain.enums.TipoCliente;
 import com.curso.udemy.nelioalves.cursomc.dto.ClienteDTO;
 import com.curso.udemy.nelioalves.cursomc.dto.ClienteNewDTO;
 import com.curso.udemy.nelioalves.cursomc.repositories.ClienteRepository;
 import com.curso.udemy.nelioalves.cursomc.repositories.EnderecoRepository;
+import com.curso.udemy.nelioalves.cursomc.security.UserSS;
+import com.curso.udemy.nelioalves.cursomc.services.exceptions.AuthorizationException;
 import com.curso.udemy.nelioalves.cursomc.services.exceptions.DataIntegrityException;
 import com.curso.udemy.nelioalves.cursomc.services.exceptions.ObjectNotFoundException;
 
@@ -35,6 +38,12 @@ public class ClienteService {
 	private EnderecoRepository enderecoRepository;
 	
 	public Cliente find(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		if(user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Acesso negado");
+		}
+		
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado! Id: " 
 						+ id + ", Tipo: " + Cliente.class.getName()));
